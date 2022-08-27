@@ -1,0 +1,142 @@
+\documentclass{article}
+\usepackage[english]{babel}
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{accents}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\newcommand{\Ifreq}{I_\text{freq}}
+\newcommand{\Ibayes}{I_\text{bayes}}
+\newcommand{\E}{\mathop{\mathbb{E}}}
+\newcommand{\xl}{\underaccent{\bar}{x}}
+\newcommand{\xh}{\bar{x}}
+\newcommand{\1}{\mathbf{1}}
+
+\title{The Similarities Between Frequentist Confidence Intervals and Bayesian Credible Intervals}
+\author{Ali Rahimi}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+We're a likelihood $p(y|x)$, have observed some data $y$, and wish to represent
+our uncertainty in its underlying parameter $x$. We'd like to represent this
+uncertainty with an interval function $I(y)$, represented as a lower function
+$\xl(y)$ and and upper function $\xh(y)$. A Frequentist might inspect the
+likelihood $p(y|x)$ and report a confidence interval function $\Ifreq(y)$ and
+guarantee that it covers $x$ 95\% of the time if the data $y$ are re-drawn
+infinitely many times.  A Bayesian might instead compute the posterior
+$p(x|y)$, and report a "credible" interval function, $\Ibayes(y)$, and
+guarantee that it captures 95\% of the probability mass of the posterior.
+To simplify matters, we'll consider scalar $x$ and $y$.
+
+In this story, both Frequentists and Bayesians seek an interval function
+$I(y)$. But to the Frequentist, the Bayesian makes an untenable assumption:
+when $x$ is a universal constant, not a random variable, its posterior is a
+nonsensical object.
+
+At the root of this dispute is what each of these camps mean by the word
+"probability". But I argue here that the frequentist's interval is a
+counter-intuitive object regardless of one's definition of probabilty.
+
+
+\section{The Bayesian's Credible Interval}
+
+An $\alpha$ credible interval satisfies
+\[
+\forall_y \Pr_{x|y}\left[ x \in \Ibayes(y) \;|\; y\right] = \alpha.
+\]
+Since $y$ is random, $\Ibayes(y)$ is random, so the left hand side of this
+inequality is also stochastic because is conditioned on the random variable
+$y$. 
+
+The above condition admits many solutions. Consider a function
+$\Ibayes(y)$ that satisfies the above condition. For any particular $y$, the
+interval $\Ibayes(y)$ can be shifted slightly and re-scaled slightly to obtain
+another interval that overlaps $x$ with probability $\alpha$.
+
+Among all $\alpha$-credible intervals, we prefer those that are short in some
+sense. To do that, we'll cast the above as an optimization problem:
+\begin{align}\label{eq:bayes-interval}
+\min_{\xl, \xh} &\quad  \| \xh - \xl \|_\infty \\
+\text{s.t. } & \min_y \Pr_{x|y}\left[\xl(y) < x < \xh(y)\right] \geq \alpha.
+\end{align}
+Here, $\|f\|_\infty \equiv \sup_x |f(x)|$.
+
+To appreciate the behavior of these intervals, when $\alpha\to 0$, the interval
+converges to the peak of the posterior. In the next section, I'll repeat the
+below analysis for Frequentist interviews and show that this is not the case.
+Indeed, at opt, the constraint is tight everwyhere: $\forall_y
+\Pr_{x|y}\left[\xl(y) < x < \xh(y)\right] = \alpha$, and because $\alpha\to 0$,
+$\| \xh - \xl \|_\infty \to 0$, meaning that $\forall_y \xh(y) - \xl(y) \to 0$.
+A linear approximation of the constraint around opt gives for all $y$,
+\begin{align}
+        \Pr_{x|y}\left[\xl(y) < x < \xh(y)\right] &= \int_{-\infty}^\infty p_{x|y}(x|y) \1\left[ \xl(y) < x < \xh(y)\right] \;dx\\
+        &= \int_{-\infty}^\infty p_{x|y}(x|y) \1\left[ \xl(y) < x\right] \1\left[x < \xh(y)\right] \;dx\\
+        &= \int_{-\xl(y)}^{\xh(y)} p_{x|y}(x|y) \1\left[ \xl(y) < x\right] \1\left[x < \xh(y)\right] \;dx\\
+        &\approx p_{x|y}(\xl(y) | y) \cdot \left(\xh(y)-\xl(y)\right),
+\end{align}
+so that when $\alpha\to 0$, the optimization problem amounts to
+\begin{align}
+\min_{\xl, \xh} &\quad  \| \xh - \xl \|_\infty \\
+        \text{s.t. } & \forall_y\; p_{x|y}(\xl(y) | y) \cdot \left(\xh(y)-\xl(y)\right) =\alpha,
+\end{align}
+which we can solve pointwise for each $y$:
+\begin{align}
+        \min_{\xl(y)\geq \xh(y)} &\quad  \xh(y)-\xl(y) \\
+        \text{s.t. } & p_{x|y}(\xl(y) | y) \cdot \left(\xh(y)-\xl(y)\right) =\alpha.
+\end{align}
+The constraint implies $ \left(\xh(y)-\xl(y)\right) = \alpha / p_{x|y}(\xl(y) | y) $. Plugging this in gives the equivalent optimization problem
+\[
+        \min_{\xl(y)\geq \xh(y)} \quad  \alpha / p_{x|y}(\xl(y) | y),
+\]
+or more simply, to for all $y$, we must have
+\[
+        \max_{\xl(y)}  p_{x|y}(\xl(y) | y).
+\]
+meaning that $\xl(y)$ is the peak of the posterior $p_{x|y}(x|y)$.
+
+
+\section{The Frequentist's Confidence Interval}
+
+An $\alpha$ confidence interval must satisfy
+\begin{equation}
+\forall_x\; \Pr_{y|x}\left[x \in \Ifreq(y)\right] = \alpha.
+\end{equation}
+While $\Ifreq(y)$ is random (its location and width depend on $y$), the left
+hand side of the inequality is deterministic. The only source of randomness,
+$y$, appears inside the $\Pr$. 
+
+Among all $\alpha$-confidence intervals, we prefer those that are short in some
+sense. As before, it's tempting to cast the optimization problem
+\begin{align}\label{eq:freq-interval}
+\min_{\xl, \xh} &\quad  \| \xh - \xl \|_\infty \\
+\text{s.t. } & \min_x \Pr_{y|x}\left[\xl(y) < x < \xh(y) \right] \geq \alpha.
+\end{align}
+As we take $\alpha\to 0$, $\xl(y) \to \xh(y)$ pointwise, but the interval does not converge to the maximum likelihood $x$. Indeed,
+\begin{align}
+        \Pr_{y|x}\left[\xl(y) < x < \xh(y)\right] &= \int_{-\infty}^\infty p_{y|x}(y|x) \1\left[ \xl(y) < x\right] \1\left[x < \xh(y)\right] \;dy\\
+        &= \int_{-\infty}^\infty p_{y|x}(y|x) \1\left[ y < \xl^{-1}(x)\right] \1\left[\xl^{-1}(x) < y\right] \;dy\\
+        &= \int_{\xh^{-1}(x)}^{\xl^{-1}(x)} p_{y|x}(y|x)  \;dy\\
+        &\approx p_{y|x}\left(\xh^{-1}(x) | x\right) \cdot \left(\xh^{-1}(x)-\xl^{-1}(x)\right).
+\end{align}
+Replacing the constraint gives, as $\alpha\to 0$,
+\begin{align}
+\min_{\xl, \xh} &\quad  \| \xh - \xl \|_\infty \\
+\text{s.t. } & \forall_x\; p_{y|x}\left(\xh^{-1}(x) | x\right) \cdot \left(\xl^{-1}(x)-\xh^{-1}(x)\right) = \alpha.
+\end{align}
+To simplify this, we'll use $\frac{\xh(y) - \xl(y)}{\xl^{-1}(x)-\xh^{-1}(x)} \approx \dot{\xh}(y)$ when $x = \xh(y)$ to write the problem as
+\begin{align}
+        \min_{\xl^{-1}, \xh^{-1}} &\quad  \| \left(\xl^{-1} - \xh^{-1} \right) \cdot \dot{\xl}^{-1}\|_\infty \\
+\text{s.t. } & \forall_x\; p_{y|x}\left(\xh^{-1}(x) | x\right) \cdot \left(\xl^{-1}(x)-\xh^{-1}(x)\right) = \alpha,
+\end{align}
+
+The presence of $\dot{\xl}^{-1}$ in the objective means we can't solve this
+problem pointwise. In particular, our choice of $\ell_\infty$ norm to penalize
+the width of the interval implies that the interval does not converge to the
+maximum likelihood estimate.
+
+\section{A Frequentist Confidence Interval That Converges to the Maximum Likelihood Estimate}
+
+\end{document}
