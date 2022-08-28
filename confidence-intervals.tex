@@ -91,18 +91,18 @@ So when $\alpha\to 0$, the optimization problem amounts to
 \end{align}
 which can be solved pointwise at each $y$:
 \begin{align}
-        \min_{\xl(y)\geq \xh(y)} &\quad  \xh(y)-\xl(y) \\
+        \min_{\xl(y)\leq \xh(y)} &\quad  \xh(y)-\xl(y) \\
         \text{s.t. } & p_{x|y}(\xl(y) | y) \cdot \left(\xh(y)-\xl(y)\right) =\alpha.
 \end{align}
 The constraint implies $\xh(y)-\xl(y) = \alpha / p_{x|y}(\xl(y) | y) $. Plugging this in gives the equivalent optimization problem
 \[
-        \min_{\xl(y)\geq \xh(y)} \quad  \alpha / p_{x|y}(\xl(y) | y),
+        \min_{\xl(y)\leq \xh(y)} \quad  \alpha / p_{x|y}(\xl(y) | y),
 \]
 or more simply, for all $y$,
 \[
         \max_{\xl(y)}  p_{x|y}(\xl(y) | y).
 \]
-meaning that $\xl(y)$ is the peak of the posterior $p(x|y)$.
+meaning that $\xl(y)$ is the peak of the posterior $p(x|y)$, as expected.
 
 
 \section{The Frequentist's Confidence Interval}
@@ -121,7 +121,8 @@ sense. As before, it's tempting to cast the optimization problem
 \min_{\xl, \xh} &\quad  \| \xh - \xl \|_\infty \\
 \text{s.t. } & \min_x \Pr_{y|x}\left[\xl(y) < x < \xh(y) \right] \geq \alpha.
 \end{align}
-As we take $\alpha\to 0$, $\xl(y) \to \xh(y)$ pointwise, but the interval does not converge to the maximum likelihood $x$. Indeed,
+As we take $\alpha\to 0$, $\xl(y) \to \xh(y)$ pointwise as before, but the
+interval does not converge to the maximum likelihood $x$. Indeed,
 \begin{align}
         \Pr_{y|x}\left[\xl(y) < x < \xh(y)\right] &= \int_{-\infty}^\infty p(y|x) \1\left[ \xl(y) < x\right] \1\left[x < \xh(y)\right] \;dy\\
         &= \int_{-\infty}^\infty p(y|x) \1\left[ y < \xl^{-1}(x)\right] \1\left[\xl^{-1}(x) < y\right] \;dy\\
@@ -142,7 +143,9 @@ To simplify this, we'll use $\frac{\xh(y) - \xl(y)}{\xl^{-1}(x)-\xh^{-1}(x)} \ap
 The presence of $\dot{\xl}^{-1}$ in the objective means we can't solve this
 problem pointwise. In particular, our choice of $\ell_\infty$ norm to penalize
 the width of the interval implies that the interval does not converge to the
-maximum likelihood estimate.
+maximum likelihood estimate. The one exception to this is when $\xli$ is
+linear, so that its derivative is constant. This happens, for example, when $x$
+is the location parameter of a distribution.
 
 \section{A Frequentist Confidence Interval That Converges to the Maximum Likelihood Estimate}
 
@@ -150,7 +153,6 @@ Here is a Frequentist confidence interval that does converge to the maximum
 likelihood estimate of $x$ as $\alpha\to 0$. Instead of penalizing
 $\|\xh-\xl\|_\infty$, we'll penalize the width of the inverse of the confidence
 interval:
-
 \begin{align}
 \min_{\xl, \xh} &\quad  \| \xl^{-1} - \xh^{-1} \|_\infty \\
 \text{s.t. } & \min_x \Pr_{y|x}\left[\xl(y) < x < \xh(y) \right] \geq \alpha.
@@ -169,8 +171,8 @@ After substituting the constraint into the objective, this gives
 \begin{align}
   \max_{\xhi(x)} &\quad  p_{y|x}\left(\xhi(x) | x\right) 
 \end{align}
-In other words, for each x, $y=\xhi(x)$ the most probable observation under
-$y$, or equivalently, for each observation $y$, $\xh(y)$ is the $x$ under which
+In other words, for each x, $\xhi(x)$ the most probable observation under
+$x$, or equivalently, for each observation $y$, $\xh(y)$ is the $x$ under which
 $y$ is most probable. That's exactly the definition of the maximum likelihood
 estimate of $x$ under an observation $y$.
  
